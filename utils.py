@@ -1,4 +1,4 @@
-from classes import ListDropdown, DictDropdown, ValueTextField
+from ui_components import ListDropdown, DictDropdown, ValueTextField
 import json
 
 def all_options_primitive(dropdown) -> bool:
