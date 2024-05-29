@@ -1,0 +1,29 @@
+{
+    "user": {
+        "name": "John",
+        "address": {
+            "street": "Rua Oliveira Raimundo",
+            "city": "Anytown"
+        },
+        "contacts": [
+            {
+                "type": "email",
+                "value": "john@example.com"
+            },
+            {
+                "type": "phone",
+                "value": "555-4321"
+            }
+        ]
+    },
+    "tasks": [
+        {
+            "title": "Task 1",
+            "completed": true
+        },
+        {
+            "title": "Task 2",
+            "completed": true
+        }
+    ]
+}

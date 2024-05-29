@@ -4,19 +4,21 @@ from abc import ABC, abstractmethod
 from ui_components import ValueTextField, ListDropdown, DictDropdown
 from utils import ui_component, is_valid_json_list_or_dict, all_options_primitive, create_child_for_dict, create_child_for_list, create_child_for_value
 
-class DataNavigatorBase(ft.UserControl):
+class SaveButton(ft.IconButton):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.icon = ft.icons.SAVE
+
+class DataNavigatorBase(ft.UserControl, ABC):
     def __init__(self, data, column=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.root = ui_component(data)
         self.root.on_change = self.key_change
+        self.save_button = SaveButton(on_click=self.save)
         self.components_structure = ft.Column() if column else ft.Row()
         self.components_structure.controls = [self.root]
         self.next_node(self.root)
         self.components_structure_update()
-
-    @abstractmethod
-    def next_node(self, current):
-        pass
 
     def key_change(self, e: ft.ControlEvent):
         self.next_node(e.control)
@@ -35,49 +37,46 @@ class DataNavigatorBase(ft.UserControl):
                 break
 
     def build(self):
+        self.components_structure.controls.append(self.save_button)
         return self.components_structure
+
+    def common_next_node_logic(self, current):
+        value = current.value if isinstance(current, ListDropdown) else current.dictionary[current.value]
+        
+        if is_valid_json_list_or_dict(value):
+            parsed_value = json.loads(value)
+            current.child = create_child_for_list(parsed_value) if isinstance(parsed_value, list) else create_child_for_dict(parsed_value)
+        elif isinstance(current, DictDropdown) and isinstance(value, (list, dict)):
+            current.child = create_child_for_list(value) if isinstance(value, list) else create_child_for_dict(value)
+        else:
+            current.child = create_child_for_value(value)
+
+    @abstractmethod
+    def next_node(self, current):
+        pass
 
 class SingleFieldEditor(DataNavigatorBase):
     def next_node(self, current):
         while current.child:
-            value = current.value if isinstance(current, ListDropdown) else current.dictionary[current.value]
-            
-            if is_valid_json_list_or_dict(value):
-                parsed_value = json.loads(value)
-                current.child = create_child_for_list(parsed_value) if isinstance(parsed_value, list) else create_child_for_dict(parsed_value)
-            elif isinstance(current, DictDropdown) and isinstance(value, (list, dict)):
-                current.child = create_child_for_list(value) if isinstance(value, list) else create_child_for_dict(value)
-            else:
-                current.child = create_child_for_value(value)
-            
+            self.common_next_node_logic(current)
             if not isinstance(current.child, ValueTextField):
                 current.child.on_change = self.key_change
-            
             current = current.child
 
 class AllFieldsEditor(DataNavigatorBase):
     def next_node(self, current):
         while current.child:
-            value = current.value if isinstance(current, ListDropdown) else current.dictionary[current.value]
-
-            if is_valid_json_list_or_dict(value):
-                parsed_value = json.loads(value)
-                current.child = create_child_for_list(parsed_value) if isinstance(parsed_value, list) else create_child_for_dict(parsed_value)
-            elif isinstance(current, DictDropdown) and isinstance(value, (list, dict)):
-                current.child = create_child_for_list(value) if isinstance(value, list) else create_child_for_dict(value)
-            else:
-                current.child = create_child_for_value(value)
-
+            self.common_next_node_logic(current)
             if not isinstance(current.child, ValueTextField) and all_options_primitive(current.child):
                 if isinstance(current.child, ListDropdown):
                     if current.child.options:
                         current.child = [ValueTextField(label=f'start_value={option.key}', value=option.key)
-                                        for option in current.child.options]
+                                         for option in current.child.options]
                     else:
                         current.child = [ValueTextField(value="")]
                 else:
                     current.child = [ValueTextField(label=option.key, value=current.child.dictionary[option.key])
-                                        for option in current.child.options]
+                                     for option in current.child.options]
                 break
             current.child.on_change = self.key_change if not isinstance(current.child, ValueTextField) else None
             current = current.child
