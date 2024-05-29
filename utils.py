@@ -12,19 +12,6 @@ def convert_number(number_str: str):
             return float(number_str)
         except ValueError:
             return number_str
-
-def path_treatment(path):
-    keys = path.split("/")
-    for i, key in enumerate(keys):
-        if starts_and_ends_with(key, "''"):
-            keys[i] = key.strip("''")
-        elif key.isdigit():
-            keys[i] = convert_number(key)
-        elif is_valid_json_list_or_dict(key):
-            keys[i] = json.loads(key)
-    if len(keys) == 1:
-        return keys[0]
-    return keys
  
 def all_options_primitive(dropdown) -> bool:
     for option in dropdown.options:
