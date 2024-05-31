@@ -25,7 +25,7 @@ def path_treatment(path):
     
     return keys
 
-def complex_data_item_replacer(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False):
+def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False):
     # Realiza o tratamento do caminho para garantir que seja compatível com o resto do código
     keys = path_treatment(path)
 
@@ -45,12 +45,12 @@ def complex_data_item_replacer(data: Union[list, dict, str, int, float], path: s
                         # Garante que as chaves sejam convertidas em strings válidas, se necessário
                         keys = [json.dumps(key) if not isinstance(key, str) else key for key in keys]
                         path = "/".join(keys)
-                        complex_data_item_replacer(data[i], path, new_value)
+                        update_data_by_path(data[i], path, new_value)
                     return data
                 
         # Verifica se a estrutura de dados atual é um dicionário
         elif isinstance(data, dict):
-            for dict_key, value in data.items():
+            for dict_key in data.keys():
                 # Verifica se a chave do dicionário atual é igual à chave
                 if dict_key == key:
                     # Se a chave do dicionário for a chave final, substitui pelo novo valor
@@ -62,7 +62,7 @@ def complex_data_item_replacer(data: Union[list, dict, str, int, float], path: s
                         # Garante que as chaves sejam convertidas em strings válidas, se necessário
                         keys = [json.dumps(key) if not isinstance(key, str) else key for key in keys]
                         path = "/".join(keys)
-                        complex_data_item_replacer(data[dict_key], path, new_value)
+                        update_data_by_path(data[dict_key], path, new_value)
                     return data
                 
     # Retorna False se a opção false_if_not_found for True e a chave não for encontrada
