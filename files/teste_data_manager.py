@@ -31,3 +31,7 @@ print()
 
 dmp.update_value(["eu descasco", "banana", "com as mãos"])
 pprint(dm.get_data)
+
+dm.save_data("biroliro.json")
+dmp.update_value("SURF ROCK!!!")
+dm.save_data("you.json")

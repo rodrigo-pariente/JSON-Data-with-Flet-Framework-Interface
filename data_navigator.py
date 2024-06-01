@@ -3,6 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from ui_components import ValueTextField, ListDropdown, DictDropdown
 from utils import ui_component, is_valid_json_list_or_dict, all_options_primitive, create_child_for_dict, create_child_for_list, create_child_for_value
+from data_manager import DataManager
 
 class SaveButton(ft.IconButton):
     def __init__(self, *args, **kwargs):
@@ -10,11 +11,11 @@ class SaveButton(ft.IconButton):
         self.icon = ft.icons.SAVE
 
 class DataNavigatorBase(ft.UserControl, ABC):
-    def __init__(self, data, column=True, *args, **kwargs):
+    def __init__(self, data_manager: DataManager, column=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.root = ui_component(data)
+        self.data_manager = data_manager
+        self.root = ui_component(data_manager.get_data)
         self.root.on_change = self.key_change
-        self.save_button = SaveButton(on_click=self.save)
         self.components_structure = ft.Column() if column else ft.Row()
         self.components_structure.controls = [self.root]
         self.next_node(self.root)
@@ -37,7 +38,6 @@ class DataNavigatorBase(ft.UserControl, ABC):
                 break
 
     def build(self):
-        self.components_structure.controls.append(self.save_button)
         return self.components_structure
 
     def common_next_node_logic(self, current):

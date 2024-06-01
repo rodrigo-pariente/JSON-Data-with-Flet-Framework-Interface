@@ -2,11 +2,12 @@ import flet as ft
 import json
 
 class ValueTextField(ft.TextField):
-    def __init__(self, value='', *args, **kwargs):
+    def __init__(self, value='', path=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.value = value
         self.child = None
-
+        self.path = path
+        
 class DictDropdown(ft.Dropdown):
     def __init__(self, dictionary, *args, **kwargs):
         super().__init__(*args, **kwargs)
