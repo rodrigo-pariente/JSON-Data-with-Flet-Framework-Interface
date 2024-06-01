@@ -23,6 +23,11 @@ new_value = "QUE QUE É MEU??"
 dm = DataManager(dados)
 dmp = DataManagerPoint(dm, path_1)
 pprint(dmp.get_value)
-dm.update_data(path_2, new_value)
 print()
+
+dm.update_data(path_2, new_value)
 pprint(dmp.get_value)
+print()
+
+dmp.update_value(["eu descasco", "banana", "com as mãos"])
+pprint(dm.get_data)

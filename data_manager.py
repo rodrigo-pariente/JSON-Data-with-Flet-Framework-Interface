@@ -56,6 +56,7 @@ class DataManagerPoint:
                         else:
                             keys.pop(0)
                             return self._data_masker(data[dict_key], path=keys, converted_path=True)
+
         # Retorna False se a opção false_if_not_found for True e a chave não for encontrada
         if false_if_not_found:
             return False
