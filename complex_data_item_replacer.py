@@ -92,5 +92,10 @@ path_4 = """[
         "último_elemento_lista"
     ]/{'chave_dict_lista': [1, 2, 3]}/'chave_dict_lista'/2"""
 new_value_4 = "boing 787"
-modified = complex_data_item_replacer(dados_complexos, path_4, new_value_4, false_if_not_found=True)
+
+dado = [{"Tenacious D": "Tribute", "Dio": "Holy Diver"},
+        1, 2, {"lista": ["decoy"]}, 3, ["Angra", 27, "Lione", "Fim do dado"]]
+path = "{'lista': ['decoy']}/'lista'/'decoy'"
+
+modified = complex_data_item_replacer(dado, path, "Verdadeiro", false_if_not_found=True)
 print(modified)

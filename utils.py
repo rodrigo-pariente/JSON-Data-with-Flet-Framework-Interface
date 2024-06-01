@@ -25,9 +25,8 @@ def path_treatment(path):
     
     return keys
 
-def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False):
-    # Realiza o tratamento do caminho para garantir que seja compatível com o resto do código
-    keys = path_treatment(path)
+def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False, converted_path: bool=False):
+    keys = path_treatment(path) if not converted_path else path
 
     # Itera sobre as chaves no caminho
     for key in keys:
@@ -35,17 +34,13 @@ def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new
         if isinstance(data, list):
             for i, item in enumerate(data):
                 # Verifica se o item atual é igual à chave
-                if item == key:
+                if i == key:
                     # Se o item for a chave final, substitui pelo novo valor
-                    if item == keys[-1]:
+                    if i == keys[-1] and len(keys) == 1:
                         data[i] = new_value
                     else:
-                        # Se não for a chave final, continua a busca recursivamente
                         keys.pop(0)
-                        # Garante que as chaves sejam convertidas em strings válidas, se necessário
-                        keys = [json.dumps(key) if not isinstance(key, str) else key for key in keys]
-                        path = "/".join(keys)
-                        update_data_by_path(data[i], path, new_value)
+                        update_data_by_path(data[i], path=keys, new_value=new_value, converted_path=True)
                     return data
                 
         # Verifica se a estrutura de dados atual é um dicionário
@@ -57,12 +52,8 @@ def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new
                     if dict_key == keys[-1]:
                         data[dict_key] = new_value
                     else:
-                        # Se não for a chave final, continua a busca recursivamente
                         keys.pop(0)
-                        # Garante que as chaves sejam convertidas em strings válidas, se necessário
-                        keys = [json.dumps(key) if not isinstance(key, str) else key for key in keys]
-                        path = "/".join(keys)
-                        update_data_by_path(data[dict_key], path, new_value)
+                        update_data_by_path(data[dict_key], path=keys, new_value=new_value, converted_path=True)
                     return data
                 
     # Retorna False se a opção false_if_not_found for True e a chave não for encontrada
