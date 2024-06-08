@@ -91,8 +91,8 @@ def create_child_for_list(data) -> ListDropdown:
 def create_child_for_dict(data) -> DictDropdown:
     return DictDropdown(data)
 
-def create_child_for_value(value, path) -> ValueTextField:
-    return ValueTextField(value, path)
+def create_child_for_value(value) -> ValueTextField:
+    return ValueTextField(value)
 
 def ui_component(data):
     if isinstance(data, list):
