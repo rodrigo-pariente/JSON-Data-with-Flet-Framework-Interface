@@ -36,6 +36,5 @@ class ListDropdown(ft.Dropdown):
     def get_index(self):
         for i, option in enumerate(self.options):
             if self.value == option.key:
-                print('aqui', i)
                 return i
         return -1

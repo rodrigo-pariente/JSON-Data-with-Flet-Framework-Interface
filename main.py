@@ -1,6 +1,6 @@
 import flet as ft
 from data_manager import DataManager, DataManagerPoint
-from data_navigator import SingleFieldEditor, AllFieldsEditor
+from data_navigator import SingleFieldEditor, AllFieldsEditor, SaveButton, PathInText
 
 def main(page: ft.Page):
     data = [
@@ -15,8 +15,13 @@ def main(page: ft.Page):
         "último elemento"
     ]
     data_manager = DataManager(data)
+    data_point = DataManagerPoint(data_manager=data_manager, path="1/0/'chave_dict_lista'/1")
     editor = SingleFieldEditor(data_manager=data_manager)
     page.add(editor)
+    save = SaveButton(editor)
+    page.add(save)
+    point_editor = SingleFieldEditor(data_point)
+    page.add(point_editor)
 
 if __name__ == "__main__":
     ft.app(target=main)
