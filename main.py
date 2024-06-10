@@ -15,7 +15,7 @@ def main(page: ft.Page):
         "último elemento"
     ]
     data_manager = DataManager(data)
-    editor = AllFieldsEditor(data_manager=data_manager)
+    editor = SingleFieldEditor(data_manager=data_manager)
     page.add(editor)
 
 if __name__ == "__main__":

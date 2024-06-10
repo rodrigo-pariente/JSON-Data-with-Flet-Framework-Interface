@@ -31,13 +31,19 @@ class DataNavigator(ft.UserControl, ABC):
             else:
                 self.components_structure.controls.extend(current)
                 break
-
+    
     def build(self):
         return self.components_structure
     
     def next_node(self, current):
         while not isinstance(current, list) and current.child:
-            value = current.value if isinstance(current, ListDropdown) else current.dictionary[current.value]
+            path = current.path
+            if isinstance(current, ListDropdown):
+                value = current.value
+                path += f"/{current.get_index}"
+            else:
+                value = current.dictionary[current.value]
+                path += f"/{current.value}"
 
             if is_valid_json_list_or_dict(value):
                 value = json.loads(value)
@@ -51,9 +57,12 @@ class DataNavigator(ft.UserControl, ABC):
             
             self.custom_logic(current)
             
-            if isinstance(current, (ListDropdown, DictDropdown)):
-                current.on_change = self.key_change
+            if isinstance(current, (ListDropdown, DictDropdown, ValueTextField)):
+                if not isinstance(current, ValueTextField):
+                    current.on_change = self.key_change
             current = current.child
+            path = path.replace('/', '', 1) if path.startswith("/") else path
+            current.path = path
 
     @abstractmethod
     def custom_logic(self, current):
