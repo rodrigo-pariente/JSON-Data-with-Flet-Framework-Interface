@@ -6,12 +6,12 @@
     [
         {
             "chave_dict_lista": [
-                1,
+                "3",
                 2,
                 3
             ]
         },
-        "elemento_lista_2",
+        "elemento_lista_2s",
         {
             "outra_chave_dict_lista": {
                 "sub_lista": [

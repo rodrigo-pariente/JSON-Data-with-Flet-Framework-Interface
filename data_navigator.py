@@ -1,8 +1,8 @@
 import flet as ft
 import json
 from ui_components import ValueTextField, DictDropdown, ListDropdown
-from utils import ui_component, is_valid_json_list_or_dict, all_options_primitive, create_child_for_dict, create_child_for_list, create_child_for_value
-from data_manager import DataManager, DataManagerPoint
+from utils import CustomError, path_treatment, ui_component, is_valid_json_list_or_dict, all_options_primitive, create_child_for_dict, create_child_for_list, create_child_for_value
+from data_manager import DataManager, DataManagerPoint, minimum_data_manager
 from abc import ABC, abstractmethod
 from typing import Union
 
@@ -10,25 +10,36 @@ class DataNavigator(ft.UserControl, ABC):
     def __init__(self, data_manager: Union[DataManager, DataManagerPoint], column=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.data_manager = data_manager
-
-        if isinstance(data_manager, DataManager):
-            self.root = ui_component(data_manager.get_data)
-        else:
-            self.root = ui_component(data_manager.get_value)
-
-        self.root.on_change = self.key_change
-        self.path = None
-
         self.components_structure = ft.Column() if column else ft.Row()
-        self.components_structure.controls = [self.root]
+        self.set_root()
+        self.last_key_change = None
         self.next_node(self.root)
         self.components_structure_update()
     
+    def set_root(self):
+        if isinstance(self.data_manager, DataManager):
+            self.root = ui_component(self.data_manager.get_data)
+            self.path = None
+        else:
+            self.root = ui_component(self.data_manager.get_value)
+            self.path = self.data_manager.path
+        self.root.on_change = self.key_change
+
     def key_change(self, e: ft.ControlEvent):
         self.next_node(e.control)
         self.components_structure_update()
         self.update()
-    
+
+    def refresh(self):
+        path = self.path
+        self.set_root()
+        self.next_node(self.root)
+        self.components_structure_update()
+        self.update()
+
+    def set_selection_by_path(self, path):
+        print(path)
+
     def components_structure_update(self):
         current = self.root
         self.components_structure.controls.clear()
@@ -39,7 +50,7 @@ class DataNavigator(ft.UserControl, ABC):
             else:
                 self.components_structure.controls.extend(current)
                 break
-    
+
     def build(self):
         return self.components_structure
     
@@ -71,7 +82,10 @@ class DataNavigator(ft.UserControl, ABC):
             current = current.child
             path = path.replace('/', '', 1) if path.startswith("/") else path
             current.path = path
-        self.path = current.path
+        if not isinstance(self.root, ValueTextField):
+            self.path = current.path
+        else:
+            self.root.path = self.path
 
     @abstractmethod
     def custom_logic(self, current):
@@ -94,15 +108,26 @@ class AllFieldsEditor(DataNavigator):
             else:
                 current.child = [ValueTextField(value='')]
 
-class SaveButton(ft.IconButton):
-    def __init__(self, publisher: Union[SingleFieldEditor, AllFieldsEditor],*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.icon = ft.icons.SAVE
-        self.publisher = publisher
-        self.on_click = self.update_data
-
-    def update_data(self, e: ft.ControlEvent):
-        path = self.publisher.path
-        new_value = self.publisher.components_structure.controls[-1].value
-        self.publisher.data_manager.update_data(path, new_value)
-        self.publisher.data_manager.save_data("arquivo.json")
+class EditorsGroup:
+    def __init__(self, list_of_editors: list=[]):
+        self._editors_group = list_of_editors
+        self.editors_data_manager_check()
+    
+    def add_editors(self, *args: Union[SingleFieldEditor, AllFieldsEditor]):
+        self._editors_group.append(args)
+        self.editors_data_manager_check()
+        
+    def editors_data_manager_check(self):
+        current = minimum_data_manager(self._editors_group[0].data_manager)
+        for editor in self._editors_group:
+            if current != minimum_data_manager(editor.data_manager):
+                raise CustomError(f"Error: editors data_manager are not uniform.")
+            current = minimum_data_manager(editor.data_manager)
+    
+    @property
+    def get_editors(self):
+        return self._editors_group
+    
+    @property
+    def data_manager(self):
+        return minimum_data_manager(self._editors_group[0].data_manager)

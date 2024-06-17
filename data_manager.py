@@ -66,3 +66,8 @@ class DataManagerPoint:
             return False
         # Retorna a estrutura de dados original se a chave não for encontrada
         return data
+
+def minimum_data_manager(editor_data_manager):
+    if isinstance(editor_data_manager, DataManagerPoint):
+        return editor_data_manager.data_manager
+    return editor_data_manager

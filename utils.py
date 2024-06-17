@@ -2,6 +2,9 @@ from ui_components import ListDropdown, DictDropdown, ValueTextField
 import json
 from typing import Union
 
+class CustomError(Exception):
+    pass
+
 def path_treatment(path):
     # Divide o caminho em partes usando "/" como separador
     keys = path.split("/")
