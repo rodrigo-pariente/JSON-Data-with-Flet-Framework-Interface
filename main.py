@@ -21,7 +21,7 @@ def main(page: ft.Page):
         data = json.load(file)
         
     data_manager = DataManager(data)
-    data_point = DataManagerPoint(data_manager=data_manager, path="1/0/'chave_dict_lista'/1")
+    data_point = DataManagerPoint(data_manager=data_manager, path="'user'/'contacts'/0/'value'")
     editor = SingleFieldEditor(data_manager=data_manager)
     point_editor = SingleFieldEditor(data_manager=data_point)
     editors_group = EditorsGroup([editor, point_editor])
@@ -31,6 +31,8 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     ft.app(target=main)
 
-#NECESSITA A FUNCIONALIDADE DE REFRESH, PARA ATUALIZAR CAMPOS COM VALORES ALTERADOS EM OUTROS CANTOS
+#FEITO - NECESSITA A FUNCIONALIDADE DE REFRESH, PARA ATUALIZAR CAMPOS COM VALORES ALTERADOS EM OUTROS CANTOS
 #INTEGRAR DATAMANAGER-DATAMANAGERPOINT-SINGLEFIELDEDITOR-ALLFIELDSEDITOR
+#PERMITIR QUE O DATAMANAGER POINT POSSA MÁSCARAR QUALQUER NÍVEL DE PROFUNDIDADE
 #TRATAMENTO DE DADOS
+#PERMITIR ADIÇÃO E REMOÇÃO DE DADOS

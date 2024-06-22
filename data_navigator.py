@@ -125,6 +125,7 @@ class DataNavigator(ft.UserControl, ABC):
                         current.child.value = option.key
             else:
                 current.child = create_child_for_value(value)
+            self.custom_logic(current)
 
             if isinstance(current, (ListDropdown, DictDropdown, ValueTextField)):
                 if not isinstance(current, ValueTextField):
@@ -136,7 +137,6 @@ class DataNavigator(ft.UserControl, ABC):
             self.path = current.path
         else:
             self.root.path = self.path
-
 
 class SingleFieldEditor(DataNavigator):
     def custom_logic(self, current):

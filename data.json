@@ -1,28 +1,29 @@
-[
-    {
-        "chave_dict_1": "3",
-        "chave": "3"
-    },
-    [
-        {
-            "chave_dict_lista": [
-                "Chá Chá Chá",
-                "3",
-                3
-            ]
+{
+    "user": {
+        "name": "John",
+        "address": {
+            "street": "Rua Oliveira Raimundo",
+            "city": "Anytown"
         },
-        "elemento_lista_2s",
-        {
-            "outra_chave_dict_lista": {
-                "sub_lista": [
-                    "6",
-                    6.7,
-                    8.9
-                ]
+        "contacts": [
+            {
+                "type": "email",
+                "value": "john@example.com"
+            },
+            {
+                "type": "phone",
+                "value": "555-4321"
             }
+        ]
+    },
+    "tasks": [
+        {
+            "title": "Task 1",
+            "completed": true
         },
-        100,
-        "último_elemento_lissta"
-    ],
-    "último elemento"
-]
+        {
+            "title": "Task 2",
+            "completed": true
+        }
+    ]
+}
