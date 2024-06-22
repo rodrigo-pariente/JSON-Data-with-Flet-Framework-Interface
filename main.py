@@ -2,6 +2,7 @@ import flet as ft
 from data_manager import DataManager, DataManagerPoint
 from data_navigator import SingleFieldEditor, AllFieldsEditor, EditorsGroup
 from save_button import SaveButton
+import json
 
 def main(page: ft.Page):
     data = [
@@ -15,14 +16,17 @@ def main(page: ft.Page):
         ],
         "último elemento"
     ]
+
+    with open('data.json', 'r', encoding='utf8') as file:
+        data = json.load(file)
+        
     data_manager = DataManager(data)
     data_point = DataManagerPoint(data_manager=data_manager, path="1/0/'chave_dict_lista'/1")
     editor = SingleFieldEditor(data_manager=data_manager)
-    point_editor = SingleFieldEditor(data_point)
+    point_editor = SingleFieldEditor(data_manager=data_point)
     editors_group = EditorsGroup([editor, point_editor])
-    save = SaveButton(editors_group)
-    page.add(editor, point_editor)
-    page.add(save)
+    save = SaveButton(editors_group, filename='data.json')
+    page.add(point_editor, editor, save)
 
 if __name__ == "__main__":
     ft.app(target=main)

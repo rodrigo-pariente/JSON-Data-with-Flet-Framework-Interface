@@ -12,14 +12,13 @@ class DataNavigator(ft.UserControl, ABC):
         self.data_manager = data_manager
         self.components_structure = ft.Column() if column else ft.Row()
         self.set_root()
-        self.last_key_change = None
         self.next_node(self.root)
         self.components_structure_update()
     
     def set_root(self):
         if isinstance(self.data_manager, DataManager):
             self.root = ui_component(self.data_manager.get_data)
-            self.path = None
+            self.path = ""
         else:
             self.root = ui_component(self.data_manager.get_value)
             self.path = self.data_manager.path
@@ -34,11 +33,9 @@ class DataNavigator(ft.UserControl, ABC):
         path = self.path
         self.set_root()
         self.next_node(self.root)
+        self.set_selection_by_path(path)
         self.components_structure_update()
         self.update()
-
-    def set_selection_by_path(self, path):
-        print(path)
 
     def components_structure_update(self):
         current = self.root
@@ -90,7 +87,57 @@ class DataNavigator(ft.UserControl, ABC):
     @abstractmethod
     def custom_logic(self, current):
         pass
-    
+
+    def set_selection_by_path(self, path_to_set):
+        keys = path_treatment(path_to_set)
+
+        if isinstance(self.root, ListDropdown):
+            self.root.value = self.root.options[keys[0]].key
+            self.path = f"{keys[0]}"
+        elif isinstance(self.root, DictDropdown):
+            for option in self.root.options:
+                if option.key == keys[0]:
+                    self.root.value = option.key
+                    self.path = f"{keys[0]}"
+        current = self.root
+
+        for n in range(1, (len(keys) + 1)): #Isso é melhor que o while?
+            if not current.child:
+                break
+            path = current.path
+            if isinstance(current, ListDropdown):
+                value = current.value
+                path += f"/{current.get_index}"
+            else:
+                value = current.dictionary[current.value]
+                path += f"/{current.value}"
+
+            if is_valid_json_list_or_dict(value):
+                value = json.loads(value)
+
+            if isinstance(value, list):
+                current.child = create_child_for_list(value)
+                current.child.value = current.child.options[keys[n]].key
+            elif isinstance(value, dict):
+                current.child = create_child_for_dict(value)
+                for option in current.child.options:
+                    if option.key == keys[n]:
+                        current.child.value = option.key
+            else:
+                current.child = create_child_for_value(value)
+
+            if isinstance(current, (ListDropdown, DictDropdown, ValueTextField)):
+                if not isinstance(current, ValueTextField):
+                    current.on_change = self.key_change
+            current = current.child
+            path = path.replace('/', '', 1) if path.startswith("/") else path
+            current.path = path
+        if not isinstance(self.root, ValueTextField):
+            self.path = current.path
+        else:
+            self.root.path = self.path
+
+
 class SingleFieldEditor(DataNavigator):
     def custom_logic(self, current):
         pass

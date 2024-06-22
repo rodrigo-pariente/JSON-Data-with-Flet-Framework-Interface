@@ -5,7 +5,7 @@ from typing import Union
 class CustomError(Exception):
     pass
 
-def path_treatment(path):
+def path_treatment(path) -> list:
     # Divide o caminho em partes usando "/" como separador
     keys = path.split("/")
     
