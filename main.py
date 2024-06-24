@@ -19,14 +19,11 @@ def main(page: ft.Page):
 
     with open('data.json', 'r', encoding='utf8') as file:
         data = json.load(file)
-        
+
     data_manager = DataManager(data)
-    data_point = DataManagerPoint(data_manager=data_manager, path="'user'/'contacts'/0/'value'")
-    editor = SingleFieldEditor(data_manager=data_manager)
-    point_editor = SingleFieldEditor(data_manager=data_point)
-    editors_group = EditorsGroup([editor, point_editor])
-    save = SaveButton(editors_group, filename='data.json')
-    page.add(point_editor, editor, save)
+    editor = AllFieldsEditor(data_manager=data_manager)
+    save = SaveButton(editor, filename="data.json")
+    page.add(editor, save)
 
 if __name__ == "__main__":
     ft.app(target=main)

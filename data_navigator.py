@@ -1,7 +1,7 @@
 import flet as ft
 import json
 from ui_components import ValueTextField, DictDropdown, ListDropdown
-from utils import CustomError, path_treatment, ui_component, is_valid_json_list_or_dict, all_options_primitive, create_child_for_dict, create_child_for_list, create_child_for_value
+from utils import CustomError, path_treatment, ui_component, is_valid_json_list_or_dict, all_options_primitive, only_one_option, create_child_for_dict, create_child_for_list, create_child_for_value
 from data_manager import DataManager, DataManagerPoint, minimum_data_manager
 from abc import ABC, abstractmethod
 from typing import Union
@@ -22,7 +22,8 @@ class DataNavigator(ft.UserControl, ABC):
         else:
             self.root = ui_component(self.data_manager.get_value)
             self.path = self.data_manager.path
-        self.root.on_change = self.key_change
+        if not isinstance(self.root, ValueTextField):
+            self.root.on_change = self.key_change
 
     def key_change(self, e: ft.ControlEvent):
         self.next_node(e.control)
@@ -53,107 +54,90 @@ class DataNavigator(ft.UserControl, ABC):
     
     def next_node(self, current):
         while not isinstance(current, list) and current.child:
-            path = current.path
-            if isinstance(current, ListDropdown):
-                value = current.value
-                path += f"/{current.get_index}"
-            else:
-                value = current.dictionary[current.value]
-                path += f"/{current.value}"
-
-            if is_valid_json_list_or_dict(value):
-                value = json.loads(value)
-
-            if isinstance(value, list):
-                current.child = create_child_for_list(value)
-            elif isinstance(value, dict):
-                current.child = create_child_for_dict(value)
-            else:
-                current.child = create_child_for_value(value)
-            
-            self.custom_logic(current)
-            
-            if isinstance(current, (ListDropdown, DictDropdown, ValueTextField)):
-                if not isinstance(current, ValueTextField):
-                    current.on_change = self.key_change
-            current = current.child
-            path = path.replace('/', '', 1) if path.startswith("/") else path
-            current.path = path
-        if not isinstance(self.root, ValueTextField):
-            self.path = current.path
+            current = self.dropdown_iterator(current)
+        if isinstance(current, list):
+            keys = path_treatment(current[0].path)
+            keys.pop()
+            keys = [f'{key}' for key in keys]
+            self.path = '/'.join(keys)
         else:
-            self.root.path = self.path
+            self.path = current.path
+            
+    def dropdown_iterator(self, current):
+        path = current.path
+        if isinstance(current, ListDropdown):
+            value = current.value
+            path += f"/{current.get_index}"
+        else:
+            value = current.dictionary[current.value]
+            path += f"/{current.value}"
+        if path.startswith("/"):
+            path = path.replace('/', '', 1)
 
+        if is_valid_json_list_or_dict(value):
+            value = json.loads(value)
+
+        if isinstance(value, list):
+            current.child = create_child_for_list(value)
+        elif isinstance(value, dict):
+            current.child = create_child_for_dict(value)
+        else:
+            current.child = create_child_for_value(value)
+        
+        self.custom_logic(current, path)
+        
+        if isinstance(current, (ListDropdown, DictDropdown)):
+            current.on_change = self.key_change
+
+        current = current.child
+        return current
+    
     @abstractmethod
-    def custom_logic(self, current):
+    def custom_logic(self, current, path):
         pass
 
     def set_selection_by_path(self, path_to_set):
         keys = path_treatment(path_to_set)
-
-        if isinstance(self.root, ListDropdown):
-            self.root.value = self.root.options[keys[0]].key
-            self.path = f"{keys[0]}"
-        elif isinstance(self.root, DictDropdown):
-            for option in self.root.options:
-                if option.key == keys[0]:
-                    self.root.value = option.key
-                    self.path = f"{keys[0]}"
         current = self.root
-
-        for n in range(1, (len(keys) + 1)): #Isso é melhor que o while?
-            if not current.child:
+        for n in range(0, (len(keys) + 1)): #Isso é melhor que o while?
+            if isinstance(current, list) or not current.child:
                 break
-            path = current.path
+            if not n == 0:
+                current = self.dropdown_iterator(current)
             if isinstance(current, ListDropdown):
-                value = current.value
-                path += f"/{current.get_index}"
-            else:
-                value = current.dictionary[current.value]
-                path += f"/{current.value}"
-
-            if is_valid_json_list_or_dict(value):
-                value = json.loads(value)
-
-            if isinstance(value, list):
-                current.child = create_child_for_list(value)
-                current.child.value = current.child.options[keys[n]].key
-            elif isinstance(value, dict):
-                current.child = create_child_for_dict(value)
-                for option in current.child.options:
+                current.value = current.options[keys[n]].key
+            elif isinstance(current, DictDropdown):
+                for option in current.options:
                     if option.key == keys[n]:
-                        current.child.value = option.key
-            else:
-                current.child = create_child_for_value(value)
-            self.custom_logic(current)
-
-            if isinstance(current, (ListDropdown, DictDropdown, ValueTextField)):
-                if not isinstance(current, ValueTextField):
-                    current.on_change = self.key_change
-            current = current.child
-            path = path.replace('/', '', 1) if path.startswith("/") else path
-            current.path = path
-        if not isinstance(self.root, ValueTextField):
-            self.path = current.path
+                        current.value = option.key
+        if isinstance(current, list):
+            self.path = current[0].path
         else:
-            self.root.path = self.path
+            self.path = current.path
 
 class SingleFieldEditor(DataNavigator):
-    def custom_logic(self, current):
-        pass
+    def custom_logic(self, current, path):
+        current.child.path = path
 
 class AllFieldsEditor(DataNavigator):
-    def custom_logic(self, current):
+    def custom_logic(self, current, path):
         if not isinstance(current.child, ValueTextField) and all_options_primitive(current.child):
             if current.child.options:
                 if isinstance(current.child, ListDropdown):
-                    current.child = [ValueTextField(label=f'start_value={option.key}', value=option.key)
-                                        for option in current.child.options]
+                    current.child = [ValueTextField(label=f'start_value={option.key}', value=option.key,
+                                                    path=f'{path}/{i}')
+                                        for i, option in enumerate(current.child.options)]
                 elif isinstance(current.child, DictDropdown):
-                    current.child = [ValueTextField(label=option.key, value=current.child.dictionary[option.key])
+                    current.child = [ValueTextField(label=option.key, value=current.child.dictionary[option.key],
+                                                    path=f'{path}/{option.key}')
                                         for option in current.child.options]
             else:
                 current.child = [ValueTextField(value='')]
+            for textfield in current.child:
+                if textfield.path.startswith("/"):
+                    textfield.path = textfield.path.replace('/', '', 1)
+        else:
+            current.child.path = path
 
 class EditorsGroup:
     def __init__(self, list_of_editors: list=[]):

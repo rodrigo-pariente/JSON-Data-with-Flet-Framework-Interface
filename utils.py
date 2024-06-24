@@ -1,6 +1,7 @@
 from ui_components import ListDropdown, DictDropdown, ValueTextField
 import json
 from typing import Union
+import flet as ft
 
 class CustomError(Exception):
     pass
@@ -29,33 +30,25 @@ def path_treatment(path) -> list:
     return keys
 
 def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False, converted_path: bool=False):
-    # Função recursiva auxiliar para atualizar o valor no caminho especificado
     def recurse_updater(data, key, keys):
-        # Se a chave atual for a última chave do caminho e não houver mais chaves
         if key == keys[-1] and len(keys) == 1:
-            # Atualiza o valor no caminho especificado
             data[key] = new_value
         else:
-            # Remove a chave atual e continua a busca recursiva
             keys.pop(0)
             update_data_by_path(data[key], path=keys, new_value=new_value, converted_path=True)
         return data
     
-    # Trata o caminho, dividindo-o em chaves
     keys = path_treatment(path) if not converted_path else path
 
-    # Itera sobre as chaves do caminho
     for key in keys:
         if isinstance(data, list) or isinstance(data, dict):
-            # Itera sobre os índices se for uma lista, ou sobre as chaves se for um dicionário
             for i in range(len(data)) if isinstance(data, list) else data.keys():
                 if i == key:
                     return recurse_updater(data, key, keys)
- 
-    # Retorna False se a opção false_if_not_found for True e a chave não for encontrada
-    if false_if_not_found:
+    if not path:
+        return new_value
+    elif false_if_not_found:
         return False
-    # Retorna a estrutura de dados original se a chave não for encontrada
     return data
 
 
@@ -71,7 +64,7 @@ def convert_number(number_str: str):
         except ValueError:
             return number_str
  
-def all_options_primitive(dropdown) -> bool:
+def all_options_primitive(dropdown) -> bool: # Tem um jeito mais simples?
     for option in dropdown.options:
         if isinstance(dropdown, ListDropdown):
             if is_valid_json_list_or_dict(option.key) or isinstance(option.key, (list, dict)):
@@ -87,6 +80,11 @@ def is_valid_json_list_or_dict(string: str) -> bool:
         return isinstance(data, (list, dict))
     except (json.decoder.JSONDecodeError, TypeError):
         return False
+
+def only_one_option(list: ft.Dropdown) -> bool:
+    if len(list.options) != 1:
+        return False
+    return True
 
 def create_child_for_list(data) -> ListDropdown: 
     return ListDropdown(data)

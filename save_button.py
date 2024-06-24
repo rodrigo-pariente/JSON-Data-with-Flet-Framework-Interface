@@ -22,13 +22,13 @@ class SaveButton(ft.IconButton):
                     textfields.append(component)
             return textfields
         
-        if self.editors:
+        if not self.editors == None:
             textfields = []
             for editor in self.editors:
                 textfields.extend(get_textfields(editor))
         else:
             textfields = get_textfields(self.editor)
-
+            
         for textfield in textfields:
             path = textfield.path
             new_value = textfield.value

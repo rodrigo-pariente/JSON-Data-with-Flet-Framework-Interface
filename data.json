@@ -1,29 +1,112 @@
 {
-    "user": {
-        "name": "John",
-        "address": {
-            "street": "Rua Oliveira Raimundo",
-            "city": "Anytown"
-        },
-        "contacts": [
+    "park": {
+        "name": "Wonderland Park",
+        "location": "Imaginary City",
+        "areas": [
             {
-                "type": "email",
-                "value": "john@example.com"
+                "name": "Adventure Land",
+                "attractions": [
+                    {
+                        "name": "Dragon's Flight",
+                        "type": "Roller Coaster",
+                        "min_height_cm": 120,
+                        "wait_time_minutes": 45,
+                        "features": [
+                            "Inversions",
+                            "High Speed"
+                        ]
+                    },
+                    {
+                        "name": "Pirate's Cove",
+                        "type": "Water Ride",
+                        "min_height_cm": 100,
+                        "wait_time_minutes": 30,
+                        "features": [
+                            "Waterfall",
+                            "Interactive"
+                        ]
+                    }
+                ],
+                "restaurants": [
+                    {
+                        "name": "Captain's Feast",
+                        "type": "Seafood",
+                        "menu": [
+                            {
+                                "item": "Grilled Salmon",
+                                "price": 15.99
+                            },
+                            {
+                                "item": "Lobster Bisque",
+                                "price": 12.99
+                            },
+                            {
+                                "item": "Crab Cakes",
+                                "price": 14.99
+                            }
+                        ]
+                    }
+                ],
+                "events": [
+                    {
+                        "name": "Treasure Hunt",
+                        "time": "14:00",
+                        "description": "Join the pirate crew for a fun treasure hunt!"
+                    }
+                ]
             },
             {
-                "type": "phone",
-                "value": "555-4321"
+                "name": "Fantasy Forest",
+                "attractions": [
+                    {
+                        "name": "Unicorn Carousel",
+                        "type": "Carousel",
+                        "min_height_cm": 0,
+                        "wait_time_minutes": 10,
+                        "features": [
+                            "Music",
+                            "Lights"
+                        ]
+                    },
+                    {
+                        "name": "Fairy Tale Theater",
+                        "type": "Show",
+                        "min_height_cm": 0,
+                        "wait_time_minutes": 5,
+                        "features": [
+                            "Live Performance",
+                            "Audience Interaction"
+                        ]
+                    }
+                ],
+                "restaurants": [
+                    {
+                        "name": "Magic Garden Cafe",
+                        "type": "Vegetarian",
+                        "menu": [
+                            {
+                                "item": "Garden Salad",
+                                "price": 8.99
+                            },
+                            {
+                                "item": "Vegetable Soup",
+                                "price": 7.99
+                            },
+                            {
+                                "item": "Fruit Smoothie",
+                                "price": 5.99
+                            }
+                        ]
+                    }
+                ],
+                "events": [
+                    {
+                        "name": "Enchanted Parade",
+                        "time": "16:00",
+                        "description": "Watch the magical creatures parade through the forest!"
+                    }
+                ]
             }
         ]
-    },
-    "tasks": [
-        {
-            "title": "Task 1",
-            "completed": true
-        },
-        {
-            "title": "Task 2",
-            "completed": true
-        }
-    ]
+    }
 }

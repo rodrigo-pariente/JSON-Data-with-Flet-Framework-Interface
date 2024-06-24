@@ -2,14 +2,15 @@ import flet as ft
 import json
 
 class ValueTextField(ft.TextField):
-    def __init__(self, value='', *args, **kwargs):
+    def __init__(self, value='', path='', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.value = value
         self.child = None
-        self.path = ''
+        self.path = path
+
         
 class DictDropdown(ft.Dropdown):
-    def __init__(self, dictionary, *args, **kwargs):
+    def __init__(self, dictionary, path='', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dictionary = dictionary
         self.options = [ft.dropdown.Option(json.dumps(key))
@@ -18,10 +19,10 @@ class DictDropdown(ft.Dropdown):
                         for key in dictionary.keys()]
         self.value = self.options[0].key if self.options else " "
         self.child = True
-        self.path = ''
+        self.path = path
 
 class ListDropdown(ft.Dropdown):
-    def __init__(self, list: list, *args, **kwargs):
+    def __init__(self, list: list, path='', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.list = list
         self.options = [ft.dropdown.Option(json.dumps(key))
@@ -30,7 +31,7 @@ class ListDropdown(ft.Dropdown):
                         for key in list]
         self.value = self.options[0].key if self.options else " "
         self.child = True
-        self.path = ''
+        self.path = path
     
     @property
     def get_index(self):
