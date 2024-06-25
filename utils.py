@@ -6,7 +6,7 @@ import flet as ft
 class CustomError(Exception):
     pass
 
-def path_treatment(path) -> list:
+def path_treatment(path: str) -> list:
     # Divide o caminho em partes usando "/" como separador
     keys = path.split("/")
     
@@ -29,7 +29,7 @@ def path_treatment(path) -> list:
     
     return keys
 
-def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False, converted_path: bool=False):
+def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False, converted_path: bool=False) -> Union[list, dict, str, int, float]:
     def recurse_updater(data, key, keys):
         if key == keys[-1] and len(keys) == 1:
             data[key] = new_value
@@ -52,10 +52,10 @@ def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new
     return data
 
 
-def starts_and_ends_with(string: str, circumfix: str):
+def starts_and_ends_with(string: str, circumfix: str) -> str:
     return (string.startswith(circumfix) and string.endswith(circumfix))
 
-def convert_number(number_str: str):
+def convert_number(number_str: str) -> Union[int, float, str]:
     try:
         return int(number_str)
     except ValueError:
@@ -64,7 +64,7 @@ def convert_number(number_str: str):
         except ValueError:
             return number_str
  
-def all_options_primitive(dropdown) -> bool: # Tem um jeito mais simples?
+def all_options_primitive(dropdown: Union[ListDropdown, DictDropdown, ft.Dropdown]) -> bool: # Tem um jeito mais simples?
     for option in dropdown.options:
         if isinstance(dropdown, ListDropdown):
             if is_valid_json_list_or_dict(option.key) or isinstance(option.key, (list, dict)):
@@ -86,16 +86,16 @@ def only_one_option(list: ft.Dropdown) -> bool:
         return False
     return True
 
-def create_child_for_list(data) -> ListDropdown: 
+def create_child_for_list(data: Union[str, list, dict]) -> ListDropdown: 
     return ListDropdown(data)
 
-def create_child_for_dict(data) -> DictDropdown:
+def create_child_for_dict(data: Union[str, list, dict]) -> DictDropdown:
     return DictDropdown(data)
 
-def create_child_for_value(value) -> ValueTextField:
+def create_child_for_value(value: Union[str, list, dict]) -> ValueTextField:
     return ValueTextField(value)
 
-def ui_component(data):
+def ui_component(data: Union[str, list, dict]) -> Union[ValueTextField, ListDropdown, DictDropdown]:
     if isinstance(data, list):
         return create_child_for_list(data)
     elif isinstance(data, dict):

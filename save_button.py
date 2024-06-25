@@ -5,7 +5,7 @@ from data_navigator import EditorsGroup, SingleFieldEditor, AllFieldsEditor
 from ui_components import ValueTextField
 
 class SaveButton(ft.IconButton):
-    def __init__(self, editor: Union[SingleFieldEditor, AllFieldsEditor, EditorsGroup], filename="lipsum.json", refresh=True, icon=ft.icons.SAVE, *args, **kwargs):
+    def __init__(self, editor: Union[SingleFieldEditor, AllFieldsEditor, EditorsGroup], filename: str="lipsum.json", refresh: bool=True, icon: ft.icons=ft.icons.SAVE, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.icon = icon
         self.editor = editor
@@ -15,7 +15,7 @@ class SaveButton(ft.IconButton):
         self.refresh_in_save = refresh
 
     def save_data(self, e: ft.ControlEvent):
-        def get_textfields(editor):
+        def get_textfields(editor) -> ValueTextField:
             textfields = []
             for component in editor.components_structure.controls:
                 if isinstance(component, ValueTextField):

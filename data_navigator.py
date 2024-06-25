@@ -22,6 +22,7 @@ class DataNavigator(ft.UserControl, ABC):
         else:
             self.root = ui_component(self.data_manager.get_value)
             self.path = self.data_manager.path
+        self.root.path = self.path
         if not isinstance(self.root, ValueTextField):
             self.root.on_change = self.key_change
 
@@ -34,7 +35,7 @@ class DataNavigator(ft.UserControl, ABC):
         path = self.path
         self.set_root()
         self.next_node(self.root)
-        self.set_selection_by_path(path)
+        self.set_selection_by_path(path) 
         self.components_structure_update()
         self.update()
 
@@ -49,10 +50,10 @@ class DataNavigator(ft.UserControl, ABC):
                 self.components_structure.controls.extend(current)
                 break
 
-    def build(self):
+    def build(self) -> Union[ft.Column, ft.Row]:
         return self.components_structure
     
-    def next_node(self, current):
+    def next_node(self, current: Union[ValueTextField, ListDropdown, DictDropdown]):
         while not isinstance(current, list) and current.child:
             current = self.dropdown_iterator(current)
         if isinstance(current, list):
@@ -63,7 +64,7 @@ class DataNavigator(ft.UserControl, ABC):
         else:
             self.path = current.path
             
-    def dropdown_iterator(self, current):
+    def dropdown_iterator(self, current: Union[ValueTextField, ListDropdown, DictDropdown]) -> Union[ValueTextField, ListDropdown, DictDropdown]:
         path = current.path
         if isinstance(current, ListDropdown):
             value = current.value
@@ -88,39 +89,45 @@ class DataNavigator(ft.UserControl, ABC):
         
         if isinstance(current, (ListDropdown, DictDropdown)):
             current.on_change = self.key_change
-
-        current = current.child
-        return current
+        return current.child
     
     @abstractmethod
-    def custom_logic(self, current, path):
+    def custom_logic(self, current: Union[ValueTextField, ListDropdown, DictDropdown], path: str=''):
         pass
 
-    def set_selection_by_path(self, path_to_set):
+    def set_selection_by_path(self, path_to_set: str):
         keys = path_treatment(path_to_set)
         current = self.root
-        for n in range(0, (len(keys) + 1)): #Isso é melhor que o while?
+        if isinstance(self.data_manager, DataManagerPoint):
+            minimum_component = len(path_treatment(self.data_manager.path)) + 1
+        elif isinstance(self.data_manager, DataManager):
+            minimum_component = 0
+        for n in range(minimum_component, (len(keys) + 1)): #Isso é melhor que o while?
             if isinstance(current, list) or not current.child:
                 break
             if not n == 0:
                 current = self.dropdown_iterator(current)
             if isinstance(current, ListDropdown):
+
                 current.value = current.options[keys[n]].key
             elif isinstance(current, DictDropdown):
                 for option in current.options:
                     if option.key == keys[n]:
                         current.value = option.key
         if isinstance(current, list):
-            self.path = current[0].path
+            keys = path_treatment(current[0].path)
+            keys.pop()
+            keys = [f'{key}' for key in keys]
+            self.path = '/'.join(keys)
         else:
             self.path = current.path
 
 class SingleFieldEditor(DataNavigator):
-    def custom_logic(self, current, path):
+    def custom_logic(self, current: Union[ValueTextField, ListDropdown, DictDropdown], path: str=''):
         current.child.path = path
 
 class AllFieldsEditor(DataNavigator):
-    def custom_logic(self, current, path):
+    def custom_logic(self, current: Union[ValueTextField, ListDropdown, DictDropdown], path: str=''):
         if not isinstance(current.child, ValueTextField) and all_options_primitive(current.child):
             if current.child.options:
                 if isinstance(current.child, ListDropdown):
@@ -156,9 +163,9 @@ class EditorsGroup:
             current = minimum_data_manager(editor.data_manager)
     
     @property
-    def get_editors(self):
+    def get_editors(self) -> list:
         return self._editors_group
     
     @property
-    def data_manager(self):
+    def data_manager(self) -> DataManager:
         return minimum_data_manager(self._editors_group[0].data_manager)

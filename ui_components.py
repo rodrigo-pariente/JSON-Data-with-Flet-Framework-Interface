@@ -7,7 +7,6 @@ class ValueTextField(ft.TextField):
         self.value = value
         self.child = None
         self.path = path
-
         
 class DictDropdown(ft.Dropdown):
     def __init__(self, dictionary, path='', *args, **kwargs):
@@ -34,7 +33,7 @@ class ListDropdown(ft.Dropdown):
         self.path = path
     
     @property
-    def get_index(self):
+    def get_index(self) -> int:
         for i, option in enumerate(self.options):
             if self.value == option.key:
                 return i

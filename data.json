@@ -1,18 +1,18 @@
 {
     "park": {
         "name": "Wonderland Park",
-        "location": "Imaginary City",
+        "location": "Imaginecity",
         "areas": [
             {
-                "name": "Adventure Land",
+                "name": "Adventure Forest",
                 "attractions": [
                     {
                         "name": "Dragon's Flight",
-                        "type": "Roller Coaster",
+                        "type": "Roller Coasters",
                         "min_height_cm": 120,
-                        "wait_time_minutes": 45,
+                        "wait_time_minutes": "45",
                         "features": [
-                            "Inversions",
+                            "Inversion",
                             "High Speed"
                         ]
                     },
@@ -51,7 +51,7 @@
                     {
                         "name": "Treasure Hunt",
                         "time": "14:00",
-                        "description": "Join the pirate crew for a fun treasure hunt!"
+                        "description": "Join the pirate screw for a fun treasure hunt!"
                     }
                 ]
             },

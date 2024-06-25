@@ -1,9 +1,10 @@
 from utils import path_treatment, update_data_by_path
+from typing import Union
 import json
 import os
 
 class DataManager:
-    def __init__(self, data):
+    def __init__(self, data: Union[str, list, dict]):
         self.data = data
         self.modified_data = data
 
@@ -16,7 +17,7 @@ class DataManager:
             json.dump(self.modified_data, json_file, ensure_ascii=False, indent=4)
             
     @property
-    def get_data(self):
+    def get_data(self) -> Union[str, list, dict]:
         return self.modified_data
 
 class DataManagerPoint:
@@ -24,23 +25,24 @@ class DataManagerPoint:
         self.data_manager = data_manager
         self.path = path
     
-    def update_value(self, new_value):
+    def update_value(self, new_value: Union[str, list, dict]):
+        print(self.path, new_value)
         self.data_manager.update_data(self.path, new_value=new_value)
 
     def save_value(self, filename, file_path=None):
         self.data_manager.save_data(filename=filename, file_path=file_path)
 
     @property
-    def get_value(self):
+    def get_value(self) -> Union[str, list, dict]:
         # Mostrar somente os dados a partir do endpoint
         data = self.data_manager.get_data
         path = self.path
         data_endpoint = self._data_masker(data, path)
         return data_endpoint
     
-    def _data_masker(self, data, path, false_if_not_found=True, converted_path=False):
+    def _data_masker(self, data: Union[str, list, dict], path: Union[str, list], false_if_not_found: bool=True, converted_path: bool=False) -> Union[str, list, dict]:
         # Função recursiva auxiliar para mascarar os dados no caminho especificado
-        def _recurse_data_masker(data, key, keys):
+        def _recurse_data_masker(data, key, keys) -> Union[str, list, dict]:
             # Se a chave atual for a última chave do caminho e não houver mais chaves
             if key == keys[-1] and len(keys) == 1:
                 # Retorna o valor no caminho especificado
@@ -67,7 +69,7 @@ class DataManagerPoint:
         # Retorna a estrutura de dados original se a chave não for encontrada
         return data
 
-def minimum_data_manager(editor_data_manager):
+def minimum_data_manager(editor_data_manager: Union[DataManagerPoint, DataManager]) -> DataManager:
     if isinstance(editor_data_manager, DataManagerPoint):
         return editor_data_manager.data_manager
     return editor_data_manager
