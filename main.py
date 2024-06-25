@@ -1,7 +1,7 @@
 import flet as ft
 from data_manager import DataManager, DataManagerPoint
 from data_navigator import SingleFieldEditor, AllFieldsEditor, EditorsGroup
-from save_button import SaveButton
+from buttons import SaveIconButton, SaveElevatedButton, RefreshIconButton
 import json
 
 def main(page: ft.Page):
@@ -28,8 +28,9 @@ def main(page: ft.Page):
     point = AllFieldsEditor(data_manager_point)
 
     editors_group = EditorsGroup([editor_simple, point, editor_allfields])
-    save = SaveButton(editors_group, filename="data.json")
-    page.add(ft.Row(controls=[editor_allfields, point, editor_simple, save]))
+    save = SaveIconButton(editor=editors_group, filename="data.json")
+    refresh = RefreshIconButton(editors_group)
+    page.add(ft.Row(controls=[editor_allfields, point, editor_simple, ]), ft.Row(controls=[save, refresh]))
 
 if __name__ == "__main__":
     ft.app(target=main)
