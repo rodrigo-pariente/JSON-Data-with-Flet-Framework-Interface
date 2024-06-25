@@ -24,7 +24,7 @@ def main(page: ft.Page):
     editor_allfields = AllFieldsEditor(data_manager=data_manager)
     editor_simple = SingleFieldEditor(data_manager=data_manager)
 
-    data_manager_point = DataManagerPoint(data_manager=data_manager, path="park/areas/0/attractions")
+    data_manager_point = DataManagerPoint(data_manager=data_manager, path="")
     point = AllFieldsEditor(data_manager_point)
 
     editors_group = EditorsGroup([editor_simple, point, editor_allfields])
@@ -36,6 +36,6 @@ if __name__ == "__main__":
 
 #FEITO - NECESSITA A FUNCIONALIDADE DE REFRESH, PARA ATUALIZAR CAMPOS COM VALORES ALTERADOS EM OUTROS CANTOS
 #FEITO - INTEGRAR DATAMANAGER-DATAMANAGERPOINT-SINGLEFIELDEDITOR-ALLFIELDSEDITOR
-#PERMITIR QUE O DATAMANAGER POINT POSSA MÁSCARAR QUALQUER NÍVEL DE PROFUNDIDADE
+#FEITO - PERMITIR QUE O DATAMANAGER POINT POSSA MÁSCARAR QUALQUER NÍVEL DE PROFUNDIDADE
 #TRATAMENTO DE DADOS
 #PERMITIR ADIÇÃO E REMOÇÃO DE DADOS

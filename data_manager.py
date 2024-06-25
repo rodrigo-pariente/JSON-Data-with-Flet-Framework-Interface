@@ -26,7 +26,6 @@ class DataManagerPoint:
         self.path = path
     
     def update_value(self, new_value: Union[str, list, dict]):
-        print(self.path, new_value)
         self.data_manager.update_data(self.path, new_value=new_value)
 
     def save_value(self, filename, file_path=None):
@@ -41,32 +40,24 @@ class DataManagerPoint:
         return data_endpoint
     
     def _data_masker(self, data: Union[str, list, dict], path: Union[str, list], false_if_not_found: bool=True, converted_path: bool=False) -> Union[str, list, dict]:
-        # Função recursiva auxiliar para mascarar os dados no caminho especificado
         def _recurse_data_masker(data, key, keys) -> Union[str, list, dict]:
-            # Se a chave atual for a última chave do caminho e não houver mais chaves
             if key == keys[-1] and len(keys) == 1:
-                # Retorna o valor no caminho especificado
                 return data[key]
             else:
-                # Remove a chave atual e continua a busca recursiva
                 keys.pop(0)
                 return self._data_masker(data[key], path=keys, converted_path=True)
                 
-        # Trata o caminho, dividindo-o em chaves
         keys = path_treatment(path) if not converted_path else path
 
-        # Itera sobre as chaves do caminho
         for key in keys:
             if isinstance(data, list) or isinstance(data, dict):
-                # Itera sobre os índices se for uma lista, ou sobre as chaves se for um dicionário
                 for i in range(len(data)) if isinstance(data, list) else data.keys():
                     if i == key:
                         return _recurse_data_masker(data, key, keys)
-
-        # Retorna False se a opção false_if_not_found for True e a chave não for encontrada
-        if false_if_not_found:
+        if not path:
+            return data
+        elif false_if_not_found:
             return False
-        # Retorna a estrutura de dados original se a chave não for encontrada
         return data
 
 def minimum_data_manager(editor_data_manager: Union[DataManagerPoint, DataManager]) -> DataManager:

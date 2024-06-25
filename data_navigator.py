@@ -98,9 +98,9 @@ class DataNavigator(ft.UserControl, ABC):
     def set_selection_by_path(self, path_to_set: str):
         keys = path_treatment(path_to_set)
         current = self.root
-        if isinstance(self.data_manager, DataManagerPoint):
+        if isinstance(self.data_manager, DataManagerPoint) and self.data_manager.path:
             minimum_component = len(path_treatment(self.data_manager.path)) + 1
-        elif isinstance(self.data_manager, DataManager):
+        else:
             minimum_component = 0
         for n in range(minimum_component, (len(keys) + 1)): #Isso é melhor que o while?
             if isinstance(current, list) or not current.child:
