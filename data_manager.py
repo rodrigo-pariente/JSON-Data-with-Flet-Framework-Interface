@@ -1,14 +1,17 @@
-from utils import path_treatment, update_data_by_path
+from data_treatment import data_parsing, path_treatment
 from typing import Union
 import json
 import os
 
 class DataManager:
-    def __init__(self, data: Union[str, list, dict]):
+    def __init__(self, data: Union[str, list, dict], literal: bool=True):
         self.data = data
         self.modified_data = data
+        self.literal = literal
 
     def update_data(self, path, new_value):
+        if not self.literal:
+            new_value = data_parsing(new_value)
         self.modified_data = update_data_by_path(self.modified_data, path, new_value, false_if_not_found=True)
     
     def save_data(self, filename, file_path=None):
@@ -64,3 +67,25 @@ def minimum_data_manager(editor_data_manager: Union[DataManagerPoint, DataManage
     if isinstance(editor_data_manager, DataManagerPoint):
         return editor_data_manager.data_manager
     return editor_data_manager
+
+def update_data_by_path(data: Union[list, dict, str, int, float], path: str, new_value: any, false_if_not_found: bool=False, converted_path: bool=False) -> Union[list, dict, str, int, float]:
+    def recurse_updater(data, key, keys):
+        if key == keys[-1] and len(keys) == 1:
+            data[key] = new_value
+        else:
+            keys.pop(0)
+            update_data_by_path(data[key], path=keys, new_value=new_value, converted_path=True)
+        return data
+    
+    keys = path_treatment(path) if not converted_path else path
+
+    for key in keys:
+        if isinstance(data, list) or isinstance(data, dict):
+            for i in range(len(data)) if isinstance(data, list) else data.keys():
+                if i == key:
+                    return recurse_updater(data, key, keys)
+    if not path:
+        return new_value
+    elif false_if_not_found:
+        return False
+    return data

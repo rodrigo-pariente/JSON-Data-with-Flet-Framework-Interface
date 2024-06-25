@@ -1,10 +1,11 @@
 import flet as ft
 import json
-from ui_components import ValueTextField, DictDropdown, ListDropdown
-from utils import CustomError, path_treatment, ui_component, is_valid_json_list_or_dict, all_options_primitive, only_one_option, create_child_for_dict, create_child_for_list, create_child_for_value
-from data_manager import DataManager, DataManagerPoint, minimum_data_manager
 from abc import ABC, abstractmethod
+from data_manager import DataManager, DataManagerPoint, minimum_data_manager
+from data_treatment import is_valid_json_list_or_dict, path_treatment, all_options_primitive
 from typing import Union
+from ui_components import ValueTextField, DictDropdown, ListDropdown, ui_component, create_child_for_dict, create_child_for_list, create_child_for_value
+from utils import CustomError
 
 class DataNavigator(ft.UserControl, ABC):
     def __init__(self, data_manager: Union[DataManager, DataManagerPoint], column=True, *args, **kwargs):
